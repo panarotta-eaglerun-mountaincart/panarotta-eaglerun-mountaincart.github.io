@@ -1,0 +1,8 @@
+/* [MODIFICA] Stili per la nuova sezione "Foto e video (punto 27)". */
+.photo-choice{border:1px solid var(--line);background:#f7faf8;border-radius:12px;padding:6px 20px 4px;margin:20px 0;min-width:0}
+.photo-choice legend{font-weight:750;padding:0 8px;overflow-wrap:anywhere}
+.photo-choice .check-label{margin:16px 0}
+.form-main .photo-choice input[type=radio]{display:block;width:23px;height:23px;flex-shrink:0;margin:2px 0 0;padding:0;accent-color:var(--forest)}
+.photo-choice .check-label input:focus-visible{outline:3px solid #c13e0a;outline-offset:4px}
+.photo-panel .field-note{margin:14px 0}
+@media(max-width:620px){.photo-choice{padding:4px 14px 2px}}
