@@ -1,10 +1,27 @@
-import {validateSubmission,romeDate} from './validation.js';
+import {validateSubmission,romeDate} from './validation.js?v=20261125c';
 const lang=document.documentElement.lang;
-const t=(await(await fetch('registration-messages.json')).json())[lang];
+const t=(await(await fetch('registration-messages.json?v=20261125c')).json())[lang];
 const $=id=>document.getElementById(id);
 let config=null,minorCount=0,reviewed=null,requestId=null,submitted=false,busy=false;
 function showError(code,target='form-error') {const el=$(target);el.textContent=t.errors[code]||t.network;el.hidden=false;el.scrollIntoView({block:'center',behavior:'smooth'});}
-function person(root){const out={};root.querySelectorAll('input[name]:not([type=radio]),select[name]').forEach(el=>out[el.name]=el.value);return out;}
+function person(root){const out={};root.querySelectorAll('input[name]:not([type=radio]),select[name]').forEach(el=>out[el.name]=el.hasAttribute('data-date')?toISO(el.value):el.value);return out;}
+// [MODIFICA 25/11] data di nascita come campo di testo gg/mm/aaaa (il selettore data di iPhone usciva dal riquadro).
+// Al foglio arriva lo stesso formato di prima: AAAA-MM-GG.
+function toISO(v){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(v).trim());return m?`${m[3]}-${m[2]}-${m[1]}`:'';}
+function showDate(iso){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');return m?`${m[3]}/${m[2]}/${m[1]}`:iso;}
+function maskDate(el,inputType){
+ let v=el.value;const iso=/^\s*(\d{4})[-./](\d{1,2})[-./](\d{1,2})\s*$/.exec(v);
+ if(iso)v=iso[3].padStart(2,'0')+iso[2].padStart(2,'0')+iso[1];
+ else{const dm=/^\s*(\d{1,2})[-./ ](\d{1,2})[-./ ](\d{4})\s*$/.exec(v);if(dm)v=dm[1].padStart(2,'0')+dm[2].padStart(2,'0')+dm[3];}
+ const caret=el.selectionStart??el.value.length,before=el.value.slice(0,caret).replace(/\D/g,'').length;
+ const d=v.replace(/\D/g,'').slice(0,8),del=String(inputType||'').startsWith('delete');
+ let out=d.slice(0,2);if(d.length>2||(d.length===2&&!del))out+='/';if(d.length>2)out+=d.slice(2,4);if(d.length>4||(d.length===4&&!del))out+='/';if(d.length>4)out+=d.slice(4);
+ if(out===el.value)return;el.value=out;
+ if(document.activeElement===el){let pos=0,n=0;while(pos<out.length&&n<Math.min(before,d.length)){if(/\d/.test(out[pos]))n++;pos++;}if(n===d.length)pos=out.length;try{el.setSelectionRange(pos,pos);}catch{}}
+}
+document.addEventListener('input',e=>{if(e.target.matches&&e.target.matches('input[data-date]'))maskDate(e.target,e.inputType);});
+document.addEventListener('change',e=>{if(e.target.matches&&e.target.matches('input[data-date]'))maskDate(e.target,'');});
+function checkDates(){for(const el of $('acceptance-form').querySelectorAll('input[data-date]')){if(!toISO(el.value)||!/^\d{4}-\d{2}-\d{2}$/.test(toISO(el.value))||(()=>{const i=toISO(el.value),d=new Date(i+'T12:00:00Z');return !Number.isFinite(d.getTime())||d.toISOString().slice(0,10)!==i||i>romeDate()||Number(i.slice(0,4))<1900;})()){el.setAttribute('aria-invalid','true');el.focus({preventScroll:true});return false;}el.removeAttribute('aria-invalid');}return true;}
 // [MODIFICA] scelta foto/video (punto 27): '' se non indicata.
 function photoChoice(name){const el=document.querySelector(`input[name="${name}"]:checked`);return el?el.value:'';}
 function payload(){const adult=person($('acceptance-form').querySelector('.form-panel'));return {adult:{firstName:adult.firstName,lastName:adult.lastName,birthDate:adult.birthDate,birthPlace:adult.birthPlace,photo:photoChoice('photo-adult')},email:adult.email,emailConfirm:adult.emailConfirm,minors:[...$('minors-list').querySelectorAll('.minor-card')].map(card=>({...person(card),photo:photoChoice('photo-minor-'+card.dataset.uid)})),terms:$('terms').checked,privacy:$('privacy').checked,authority:$('authority').checked,language:lang,regulationHash:config.regulationHash};}
@@ -37,15 +54,15 @@ $('add-minor').addEventListener('click',()=>{
  const card=$('minor-template').content.firstElementChild.cloneNode(true);const uid=++minorCount;
  card.innerHTML=card.innerHTML.replaceAll('TEMPLATE',String(uid));card.dataset.uid=String(uid);
  card.querySelectorAll('[data-person-input]').forEach(el=>el.disabled=!config?.enabled);
- card.querySelector('[type=date]').max=romeDate();
  card.querySelector('.remove-minor').addEventListener('click',()=>{card.remove();renumber();$('add-minor').focus();});
  card.querySelectorAll('[name=firstName],[name=lastName]').forEach(el=>el.addEventListener('input',syncPhotoGroups));
  $('minors-list').append(card);renumber();card.querySelector('input:not(:disabled)')?.focus();
 });
-function reviewPerson(parent,title,p){const h=document.createElement('h3');h.textContent=title;parent.append(h);const dl=document.createElement('dl');for(const key of ['firstName','lastName','birthDate','birthPlace','role','photo']){if(!p[key])continue;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t[key];dd.textContent=key==='role'?t[p[key]]:key==='photo'?(p[key]==='yes'?t.photoYesShort:t.photoNoShort):p[key];dl.append(dt,dd);}parent.append(dl);}
+function reviewPerson(parent,title,p){const h=document.createElement('h3');h.textContent=title;parent.append(h);const dl=document.createElement('dl');for(const key of ['firstName','lastName','birthDate','birthPlace','role','photo']){if(!p[key])continue;const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=t[key];dd.textContent=key==='birthDate'?showDate(p[key]):key==='role'?t[p[key]]:key==='photo'?(p[key]==='yes'?t.photoYesShort:t.photoNoShort):p[key];dl.append(dt,dd);}parent.append(dl);}
 $('acceptance-form').addEventListener('submit',event=>{
  event.preventDefault();if(!config?.enabled||busy||submitted)return;$('form-error').hidden=true;
  if(!$('acceptance-form').reportValidity())return;
+ if(!checkDates()){showError('date');return;}
  const data=payload(),valid=validateSubmission(data);if(!valid.ok){showError(valid.code);return;}
  reviewed=data;requestId=crypto.randomUUID();const container=$('review-data');container.replaceChildren();reviewPerson(container,t.adult,valid.value.adult);const email=document.createElement('p');email.textContent=`${t.email}: ${valid.value.email}`;container.append(email);valid.value.minors.forEach((m,i)=>reviewPerson(container,`${t.minor} ${i+1}`,m));
  const declaration=document.createElement('p');declaration.textContent=t.terms;container.append(declaration);
@@ -72,5 +89,4 @@ try{
  $('availability').textContent=config.enabled?t.next:t.unavailable;$('availability').hidden=config.enabled;
  $('review-button').disabled=!config.enabled;$('regulation-version').textContent=`${t.version}: ${config.regulationVersion}`;
  document.querySelectorAll('[data-person-input]').forEach(el=>el.disabled=!config.enabled);
- $('adult-birthDate').max=romeDate();
 }catch{$('availability').textContent=t.network;}

@@ -19,11 +19,7 @@
 .photo-choice legend+*{clear:both}
 .minor-card legend{max-width:100%;overflow-wrap:anywhere}
 
-/* [MODIFICA 25/11 sera] Data di nascita su iPhone/Safari: il campo data nativo di iOS ignora larghezza e altezza
-   e usciva dal riquadro. Lo rendiamo identico agli altri campi (stessa larghezza, altezza e bordo). */
+/* [MODIFICA 25/11 sera] Data di nascita: ora è un normale campo di testo (gg/mm/aaaa), identico a Nome e Cognome. */
 .form-grid>*,.minor-fields,.minor-card,.form-panel{min-width:0}
-.form-main input[type=date]{-webkit-appearance:none;-moz-appearance:none;appearance:none;display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;height:50px;min-height:50px;line-height:28px;padding:10px 12px;text-align:left;background-clip:padding-box}
-.form-main input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:1.2em;line-height:28px}
-.form-main input[type=date]::-webkit-datetime-edit{padding:0;margin:0;line-height:28px}
-.form-main input[type=date]::-webkit-datetime-edit-fields-wrapper{padding:0}
-.form-main input[type=date]::-webkit-calendar-picker-indicator{margin:0 0 0 4px}
+.form-main input[data-date]{font-variant-numeric:tabular-nums}
+.form-main input[aria-invalid=true]{border-color:var(--red)}

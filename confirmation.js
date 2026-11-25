@@ -1,5 +1,5 @@
 const lang=document.documentElement.lang;
-const t=(await(await fetch('registration-messages.json')).json())[lang];
+const t=(await(await fetch('registration-messages.json?v=20261125c')).json())[lang];
 const token=new URLSearchParams(location.hash.slice(1)).get('token');
 history.replaceState(null,'',location.pathname);
 const button=document.getElementById('confirm-button'),error=document.getElementById('confirm-error');
