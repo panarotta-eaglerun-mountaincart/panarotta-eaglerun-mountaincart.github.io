@@ -4,9 +4,6 @@
    e le icone non sembrano "tagliate" o sovrapposte. */
 .language-bar{background:#f7faf8;box-shadow:0 6px 14px -10px #102e2973}
 
-/* Ancore (#before, #cart, #distance…): il titolo arriva sempre sotto la barra lingue. */
-.section,[id^="rule-"],.parts-list li,.distance-panel{scroll-margin-top:86px}
-
 /* Riquadri in alto (2 · 20 m · 50 m): il numero non finisce sotto la freccia sugli schermi stretti. */
 .quick-rules strong{white-space:nowrap}
 .quick-rules span{overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
