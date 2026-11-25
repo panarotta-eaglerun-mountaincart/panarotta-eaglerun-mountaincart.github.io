@@ -1,0 +1,23 @@
+/* [MODIFICA 25/11] Correzioni per la visualizzazione da telefono. Non cambia testi né stile, solo allineamenti. */
+
+/* Barra lingue fissa in alto: sfondo pieno e ombra leggera, così è chiaro che il contenuto scorre sotto
+   e le icone non sembrano "tagliate" o sovrapposte. */
+.language-bar{background:#f7faf8;box-shadow:0 6px 14px -10px #102e2973}
+
+/* Ancore (#before, #cart, #distance…): il titolo arriva sempre sotto la barra lingue. */
+.section,[id^="rule-"],.parts-list li,.distance-panel{scroll-margin-top:86px}
+
+/* Riquadri in alto (2 · 20 m · 50 m): il numero non finisce sotto la freccia sugli schermi stretti. */
+.quick-rules strong{white-space:nowrap}
+.quick-rules span{overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+@media(max-width:640px){
+  .quick-rules strong{font-size:min(2.35rem,calc(15.5vw - 25px))}
+}
+@media(max-width:360px){
+  .quick-rules strong{font-size:calc(15.5vw - 25px)}
+}
+
+/* Foto e video: il titolo del riquadro (es. nome lungo del minore) va a capo dentro il riquadro, senza essere attraversato dal bordo. */
+.photo-choice legend{float:left;width:100%;padding:16px 0 18px;margin:0;line-height:1.35}
+.photo-choice legend+*{clear:both}
+.minor-card legend{max-width:100%;overflow-wrap:anywhere}
