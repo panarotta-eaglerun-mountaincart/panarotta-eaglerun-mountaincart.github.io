@@ -3,7 +3,7 @@
 //           Finché è vuoto il modulo resta disattivato e mostra "La registrazione online non è ancora attiva".
 // closed:   metti true per sospendere la raccolta delle accettazioni.
 window.MC_CONFIG = {
-  endpoint: "",
+  endpoint: "https://script.google.com/macros/s/AKfycbwqNmdzcuUIyhQv0YpDjUHxhBKxkQUO07uHIByPUEZASIZ1h62_5zFk5E5rtMHDsJOT/exec",
   closed: false,
   regulations: {
     it: { version: "PER-2026-09-07-IT-bee1f4df", hash: "bee1f4df70bf17d51471b6396cb89902f189e1ee644d5a1a16375c169ab4247f" },
